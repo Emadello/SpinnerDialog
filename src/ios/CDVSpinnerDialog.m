@@ -75,27 +75,23 @@
 
 
 - (void) show:(CDVInvokedUrlCommand*)command {
-
+    
     callbackId = command.callbackId;
-
+    
     title = [command argumentAtIndex:0];
     message = [command argumentAtIndex:1];
     isFixed = [command argumentAtIndex:2];
-    alpha = [command argumentAtIndex:3];
-    red = [command argumentAtIndex:4];
-    green = [command argumentAtIndex:5];
-    blue = [command argumentAtIndex:6];
     
-    UIViewController *rootViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-
-    [rootViewController.view addSubview:self.overlay];
-
+    //UIViewController *rootViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+    
+    [self.topViewController.view addSubview:self.overlay];
+    
 }
-
+    
 - (void) hide:(CDVInvokedUrlCommand*)command {
     [self hide];
 }
-
+    
 - (void) hide {
     if (_overlay) {
         [self.indicator stopAnimating];
@@ -107,6 +103,26 @@
         _overlay = nil;
     }
 }
+    
+- (UIViewController *)topViewController{
+    return [self topViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+}
+    
+- (UIViewController *)topViewController:(UIViewController *)rootViewController
+    {
+        if (rootViewController.presentedViewController == nil) {
+            return rootViewController;
+        }
+        
+        if ([rootViewController.presentedViewController isMemberOfClass:[UINavigationController class]]) {
+            UINavigationController *navigationController = (UINavigationController *)rootViewController.presentedViewController;
+            UIViewController *lastViewController = [[navigationController viewControllers] lastObject];
+            return [self topViewController:lastViewController];
+        }
+        
+        UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
+        return [self topViewController:presentedViewController];
+    }
 
 #pragma mark - PRIVATE METHODS
 
